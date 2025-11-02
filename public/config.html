@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overlay Configuration</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Overlay Configuration</h1>
+      <p class="subtitle">Customize your translation overlay appearance</p>
+    </header>
+
+    <div class="preview-section">
+      <h2>Live Preview</h2>
+      <div id="preview-box">
+        <div id="preview-text" class="preview-text">
+          This is a preview of your translation overlay
+        </div>
+      </div>
+    </div>
+
+    <form id="config-form">
+      <div class="form-section">
+        <h3>Text Styling</h3>
+
+        <div class="form-group">
+          <label for="color">Text Color</label>
+          <div class="color-input-group">
+            <input type="color" id="color" name="color" value="#FFFFFF">
+            <input type="text" id="color-text" value="#FFFFFF" placeholder="#FFFFFF">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fontSize">Font Size</label>
+          <div class="range-input-group">
+            <input type="range" id="fontSize" name="fontSize" min="12" max="72" value="24">
+            <span id="fontSize-value">24px</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fontFamily">Font Family</label>
+          <select id="fontFamily" name="fontFamily">
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="'Courier New', monospace">Courier New</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+            <option value="Verdana, sans-serif">Verdana</option>
+            <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+            <option value="Impact, fantasy">Impact</option>
+            <option value="'Segoe UI', sans-serif">Segoe UI</option>
+            <option value="Tahoma, sans-serif">Tahoma</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="textAlign">Text Alignment</label>
+          <select id="textAlign" name="textAlign">
+            <option value="left">Left</option>
+            <option value="center">Center</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Display Options</h3>
+
+        <div class="form-group">
+          <label for="maxLines">Maximum Lines</label>
+          <div class="range-input-group">
+            <input type="range" id="maxLines" name="maxLines" min="1" max="10" value="5">
+            <span id="maxLines-value">5</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="padding">Padding</label>
+          <div class="range-input-group">
+            <input type="range" id="padding" name="padding" min="0" max="50" value="10">
+            <span id="padding-value">10px</span>
+          </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" id="scrollEnabled" name="scrollEnabled">
+            <span>Enable Scrolling</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Background</h3>
+
+        <div class="form-group">
+          <label for="backgroundColor">Background Color</label>
+          <div class="color-input-group">
+            <input type="color" id="backgroundColor" name="backgroundColor" value="#000000">
+            <input type="text" id="backgroundColor-text" value="transparent" placeholder="transparent">
+          </div>
+          <small>Use "transparent" for OBS overlay</small>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary">
+          <span class="btn-icon">💾</span>
+          Save Configuration
+        </button>
+        <button type="button" class="btn btn-secondary" id="reset-btn">
+          <span class="btn-icon">🔄</span>
+          Reset to Default
+        </button>
+      </div>
+    </form>
+
+    <div id="status-message" class="status-message"></div>
+
+    <div class="info-section">
+      <h3>Instructions</h3>
+      <ol>
+        <li>Adjust the settings above to customize your overlay</li>
+        <li>Preview your changes in real-time</li>
+        <li>Click "Save Configuration" to apply changes</li>
+        <li>Changes will be immediately visible in OBS</li>
+      </ol>
+    </div>
+  </div>
+
+  <script src="/client.js"></script>
+</body>
+</html>

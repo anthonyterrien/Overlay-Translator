@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overlay Translator - Configuration</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0D0D0D;
+      color: #FFFFFF;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .layout {
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    /* Top Bar with Save Button */
+    .top-bar {
+      background: #1A1A1A;
+      padding: 12px 24px;
+      border-bottom: 1px solid #2A2A2A;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 56px;
+    }
+
+    .top-bar h1 {
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .top-bar-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #666;
+      padding: 6px 12px;
+      background: #0D0D0D;
+      border-radius: 6px;
+      border: 1px solid #2A2A2A;
+    }
+
+    .status-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #404040;
+    }
+
+    .status-indicator.connected {
+      background: #10B981;
+    }
+
+    /* Main Content */
+    .main-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Configuration Panel */
+    .config-panel {
+      width: 420px;
+      background: #1A1A1A;
+      border-right: 1px solid #2A2A2A;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-section h3 {
+      color: #999;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #999;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="color"],
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #2A2A2A;
+      border-radius: 6px;
+      background: #0D0D0D;
+      color: #FFFFFF;
+      font-size: 13px;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #3B82F6;
+      background: #121212;
+    }
+
+    input[type="color"] {
+      height: 36px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    .color-input-group {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 8px;
+    }
+
+    .range-input-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: #2A2A2A;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #3B82F6;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #3B82F6;
+      cursor: pointer;
+      border: none;
+    }
+
+    .range-input-group span {
+      min-width: 45px;
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: #FFFFFF;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #3B82F6;
+    }
+
+    small {
+      display: block;
+      margin-top: 4px;
+      color: #666;
+      font-size: 11px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: #3B82F6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2563EB;
+    }
+
+    .btn-secondary {
+      background: #2A2A2A;
+      color: #FFFFFF;
+      border: 1px solid #404040;
+    }
+
+    .btn-secondary:hover {
+      background: #333;
+    }
+
+    .status-message {
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      text-align: center;
+      position: fixed;
+      top: 72px;
+      right: 24px;
+      max-width: 300px;
+      display: none;
+      z-index: 1000;
+    }
+
+    .status-message.success {
+      background: #065F46;
+      color: #D1FAE5;
+      border: 1px solid #10B981;
+    }
+
+    .status-message.error {
+      background: #7F1D1D;
+      color: #FEE2E2;
+      border: 1px solid #EF4444;
+    }
+
+    /* Preview Panel */
+    .preview-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0D0D0D;
+    }
+
+    .preview-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-scale-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .preview-wrapper {
+      /* Fixed dimensions 1920x1080 - exactly like OBS (16:9 ratio) */
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      /* Scale down to fit available space */
+      transform-origin: top left;
+      /* Transparent checkered background */
+      background-image:
+        linear-gradient(45deg, #1A1A1A 25%, transparent 25%),
+        linear-gradient(-45deg, #1A1A1A 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #1A1A1A 75%),
+        linear-gradient(-45deg, transparent 75%, #1A1A1A 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+      border: 1px solid #2A2A2A;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    #preview-box {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .translation-line {
+      color: #FFFFFF;
+      font-size: 24px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      padding: 5px;
+      word-wrap: break-word;
+      line-height: 1.4;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .empty-state {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #404040;
+    }
+
+    .empty-state-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 13px;
+      color: #666;
+    }
+
+    /* Scrollbar styling */
+    .config-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .config-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .config-panel::-webkit-scrollbar-thumb {
+      background: #2A2A2A;
+      border-radius: 3px;
+    }
+
+    .config-panel::-webkit-scrollbar-thumb:hover {
+      background: #404040;
+    }
+
+    /* Confirmation Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: #1A1A1A;
+      border: 1px solid #2A2A2A;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .modal h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #FFFFFF;
+    }
+
+    .modal p {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <h1>Overlay Translator</h1>
+      <div class="top-bar-actions">
+        <div class="connection-status">
+          <span class="status-indicator" id="connection-indicator"></span>
+          <span id="connection-text">Connecting...</span>
+        </div>
+        <button type="button" class="btn btn-secondary" id="reset-btn">Reset</button>
+        <button type="button" class="btn btn-primary" id="save-btn">Save Configuration</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Configuration Panel -->
+      <div class="config-panel">
+        <form id="config-form">
+          <div class="form-section">
+            <h3>Text Styling</h3>
+
+            <div class="form-group">
+              <label for="color">Text Color</label>
+              <div class="color-input-group">
+                <input type="color" id="color" name="color" value="#FFFFFF">
+                <input type="text" id="color-text" value="#FFFFFF">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="fontSize">Font Size</label>
+              <div class="range-input-group">
+                <input type="range" id="fontSize" name="fontSize" min="12" max="72" value="24">
+                <span id="fontSize-value">24px</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="fontFamily">Font Family</label>
+              <select id="fontFamily" name="fontFamily">
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+                <option value="'Courier New', monospace">Courier New</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                <option value="Verdana, sans-serif">Verdana</option>
+                <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                <option value="Impact, fantasy">Impact</option>
+                <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                <option value="Tahoma, sans-serif">Tahoma</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="textAlign">Text Alignment</label>
+              <select id="textAlign" name="textAlign">
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Display Options</h3>
+
+            <div class="form-group">
+              <label for="maxLines">Maximum Lines</label>
+              <div class="range-input-group">
+                <input type="range" id="maxLines" name="maxLines" min="1" max="10" value="5">
+                <span id="maxLines-value">5</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="padding">Padding Top/Bottom</label>
+              <div class="range-input-group">
+                <input type="range" id="padding" name="padding" min="0" max="100" value="10">
+                <span id="padding-value">10px</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="paddingHorizontal">Padding Left/Right</label>
+              <div class="range-input-group">
+                <input type="range" id="paddingHorizontal" name="paddingHorizontal" min="0" max="500" value="0">
+                <span id="paddingHorizontal-value">0px</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="marginLeft">Margin Left</label>
+              <div class="range-input-group">
+                <input type="range" id="marginLeft" name="marginLeft" min="0" max="500" value="0">
+                <span id="marginLeft-value">0px</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="marginRight">Margin Right</label>
+              <div class="range-input-group">
+                <input type="range" id="marginRight" name="marginRight" min="0" max="500" value="0">
+                <span id="marginRight-value">0px</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="checkbox-group">
+                <label>
+                  <input type="checkbox" id="scrollEnabled" name="scrollEnabled">
+                  <span>Enable Scrolling</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Background</h3>
+
+            <div class="form-group">
+              <label for="backgroundColor">Background Color</label>
+              <div class="color-input-group">
+                <input type="color" id="backgroundColor" name="backgroundColor" value="#000000">
+                <input type="text" id="backgroundColor-text" value="transparent">
+              </div>
+              <small>Use "transparent" for fully transparent overlay</small>
+            </div>
+
+            <div class="form-group">
+              <label for="backgroundOpacity">Background Opacity</label>
+              <div class="range-input-group">
+                <input type="range" id="backgroundOpacity" name="backgroundOpacity" min="0" max="100" value="100">
+                <span id="backgroundOpacity-value">100%</span>
+              </div>
+              <small>0% = fully transparent, 100% = fully opaque</small>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Preview Panel -->
+      <div class="preview-panel">
+        <div class="preview-container">
+          <div class="preview-scale-container" id="preview-scale-container">
+            <div class="preview-wrapper" id="preview-wrapper">
+              <div id="preview-box"></div>
+              <div class="empty-state" id="empty-state">
+                <div class="empty-state-icon">💬</div>
+                <div class="empty-state-text">Waiting for translations...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <h3>Save Configuration</h3>
+      <p>This will update the overlay settings and change the current rendering. Do you want to continue?</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="modal-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="modal-confirm">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Message -->
+  <div id="status-message" class="status-message"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

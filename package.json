@@ -1,0 +1,28 @@
+{
+  "name": "overlaytranslator",
+  "version": "1.0.0",
+  "description": "Live translation overlay for OBS with Whispering-UI integration",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "electron",
+    "obs",
+    "translation",
+    "overlay"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.16.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "electron": "^39.0.0",
+    "electron-builder": "^26.0.12"
+  }
+}

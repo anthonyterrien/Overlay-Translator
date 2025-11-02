@@ -1,0 +1,14 @@
+{
+  "color": "#b3b3b3",
+  "fontSize": "35px",
+  "fontFamily": "'Trebuchet MS', sans-serif",
+  "textAlign": "center",
+  "scrollEnabled": false,
+  "backgroundColor": "#383838",
+  "backgroundOpacity": 20,
+  "padding": "23px",
+  "paddingHorizontal": "120px",
+  "marginLeft": "0px",
+  "marginRight": "0px",
+  "maxLines": 1
+}

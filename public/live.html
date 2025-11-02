@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Translation Overlay</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: transparent;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    #overlay-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .translation-line {
+      color: #FFFFFF;
+      font-size: 24px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      padding: 5px;
+      word-wrap: break-word;
+      animation: fadeIn 0.3s ease;
+      line-height: 1.4;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-out {
+      animation: fadeOut 0.3s ease;
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+    }
+
+    /* Scrollable variant */
+    .scrollable {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    /* Custom scrollbar */
+    .scrollable::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .scrollable::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+    }
+
+    .scrollable::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 4px;
+    }
+
+    .scrollable::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay-container"></div>
+
+  <script>
+    const container = document.getElementById('overlay-container');
+    let config = {
+      color: '#FFFFFF',
+      fontSize: '24px',
+      fontFamily: 'Arial, sans-serif',
+      textAlign: 'center',
+      scrollEnabled: false,
+      backgroundColor: 'transparent',
+      backgroundOpacity: 100,
+      padding: '10px',
+      paddingHorizontal: '0px',
+      marginLeft: '0px',
+      marginRight: '0px',
+      maxLines: 5
+    };
+
+    const translations = [];
+
+    // Connect to WebSocket
+    const ws = new WebSocket('ws://localhost:3000');
+
+    ws.onopen = () => {
+      console.log('Connected to overlay server');
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+
+        if (message.type === 'translation') {
+          addTranslation(message.data);
+        } else if (message.type === 'config') {
+          updateConfig(message.data);
+        }
+      } catch (err) {
+        console.error('Error parsing message:', err);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('Disconnected from overlay server. Reconnecting...');
+      setTimeout(() => {
+        location.reload();
+      }, 3000);
+    };
+
+    function addTranslation(text) {
+      if (!text || text.trim() === '') return;
+
+      translations.push(text);
+
+      // Keep only the last N lines
+      if (translations.length > config.maxLines) {
+        translations.shift();
+      }
+
+      renderTranslations();
+    }
+
+    function renderTranslations() {
+      container.innerHTML = '';
+
+      translations.forEach((text) => {
+        const line = document.createElement('div');
+        line.className = 'translation-line';
+        line.textContent = text;
+        applyStyle(line);
+        container.appendChild(line);
+      });
+
+      // Apply scrollable class if enabled
+      if (config.scrollEnabled) {
+        container.classList.add('scrollable');
+        // Auto-scroll to bottom
+        container.scrollTop = container.scrollHeight;
+      } else {
+        container.classList.remove('scrollable');
+      }
+    }
+
+    function applyStyle(element) {
+      element.style.color = config.color;
+      element.style.fontSize = config.fontSize;
+      element.style.fontFamily = config.fontFamily;
+      element.style.textAlign = config.textAlign;
+    }
+
+    function updateConfig(newConfig) {
+      config = { ...config, ...newConfig };
+
+      // Apply container styles with padding (vertical and horizontal separately)
+      const verticalPadding = config.padding || '10px';
+      const horizontalPadding = config.paddingHorizontal || '0px';
+      container.style.padding = `${verticalPadding} ${horizontalPadding}`;
+
+      container.style.marginLeft = config.marginLeft || '0px';
+      container.style.marginRight = config.marginRight || '0px';
+
+      // Apply background color with opacity
+      if (config.backgroundColor === 'transparent') {
+        container.style.backgroundColor = 'transparent';
+      } else {
+        // Convert hex to rgba with opacity
+        const opacity = (config.backgroundOpacity || 100) / 100;
+        const hex = config.backgroundColor.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        container.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+      }
+
+      // Re-render with new styles
+      renderTranslations();
+    }
+  </script>
+</body>
+</html>
