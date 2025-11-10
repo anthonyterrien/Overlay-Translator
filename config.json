@@ -1,9 +1,9 @@
 {
-  "color": "#c4c4c4",
+  "color": "#c7c7c7",
   "fontSize": "35px",
   "fontFamily": "'Trebuchet MS', sans-serif",
   "textAlign": "center",
-  "backgroundColor": "#ee2b2b",
+  "backgroundColor": "#2e2e2e",
   "backgroundOpacity": 30,
   "padding": "10px",
   "paddingHorizontal": "50px",
