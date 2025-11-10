@@ -81,10 +81,11 @@
 
     /* Configuration Panel */
     .config-panel {
-      width: 420px;
+      min-width: 400px;
       background: #1A1A1A;
       border-right: 1px solid #2A2A2A;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 24px;
       display: flex;
       flex-direction: column;
@@ -103,6 +104,12 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+    }
+
+    .form-section.live-controls {
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #2A2A2A;
     }
 
     .form-group {
@@ -310,6 +317,8 @@
     .preview-scale-container {
       position: relative;
       display: inline-block;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     .preview-wrapper {
@@ -383,6 +392,27 @@
     .empty-state-text {
       font-size: 13px;
       color: #666;
+    }
+
+    /* Preview Controls */
+    .preview-controls {
+      padding: 12px 40px;
+      background: #1A1A1A;
+      border-top: 1px solid #2A2A2A;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preview-controls label {
+      font-size: 12px;
+      color: #999;
+      white-space: nowrap;
+    }
+
+    .preview-controls .range-input-group {
+      flex: 1;
+      max-width: 300px;
     }
 
     /* Scrollbar styling */
@@ -461,6 +491,7 @@
           <span class="status-indicator" id="connection-indicator"></span>
           <span id="connection-text">Connecting...</span>
         </div>
+        <button type="button" class="btn btn-secondary" id="server-info-btn" title="Show server URLs">Server Info</button>
         <button type="button" class="btn btn-secondary" id="reset-btn">Reset</button>
         <button type="button" class="btn btn-primary" id="save-btn">Save Configuration</button>
       </div>
@@ -471,6 +502,17 @@
       <!-- Configuration Panel -->
       <div class="config-panel">
         <form id="config-form">
+          <div class="form-section live-controls">
+            <h3>Live Controls (No Save Required)</h3>
+
+            <div class="form-group">
+              <label for="current_language">Language</label>
+              <select id="current_language" name="current_language">
+                <option value="">Auto</option>
+              </select>
+            </div>
+          </div>
+
           <div class="form-section">
             <h3>Text Styling</h3>
 
@@ -520,14 +562,6 @@
             <h3>Display Options</h3>
 
             <div class="form-group">
-              <label for="maxLines">Maximum Lines</label>
-              <div class="range-input-group">
-                <input type="range" id="maxLines" name="maxLines" min="1" max="10" value="5">
-                <span id="maxLines-value">5</span>
-              </div>
-            </div>
-
-            <div class="form-group">
               <label for="padding">Padding Top/Bottom</label>
               <div class="range-input-group">
                 <input type="range" id="padding" name="padding" min="0" max="100" value="10">
@@ -558,15 +592,6 @@
                 <span id="marginRight-value">0px</span>
               </div>
             </div>
-
-            <div class="form-group">
-              <div class="checkbox-group">
-                <label>
-                  <input type="checkbox" id="scrollEnabled" name="scrollEnabled">
-                  <span>Enable Scrolling</span>
-                </label>
-              </div>
-            </div>
           </div>
 
           <div class="form-section">
@@ -584,10 +609,10 @@
             <div class="form-group">
               <label for="backgroundOpacity">Background Opacity</label>
               <div class="range-input-group">
-                <input type="range" id="backgroundOpacity" name="backgroundOpacity" min="0" max="100" value="100">
+                <input type="range" id="backgroundOpacity" name="backgroundOpacity" min="1" max="100" value="100">
                 <span id="backgroundOpacity-value">100%</span>
               </div>
-              <small>0% = fully transparent, 100% = fully opaque</small>
+              <small>1% = nearly transparent, 100% = fully opaque</small>
             </div>
           </div>
         </form>
@@ -606,6 +631,13 @@
             </div>
           </div>
         </div>
+        <div class="preview-controls">
+          <label for="previewScale">Preview Zoom:</label>
+          <div class="range-input-group">
+            <input type="range" id="previewScale" name="previewScale" min="10" max="100" value="100">
+            <span id="previewScale-value">100%</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -618,6 +650,50 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" id="modal-cancel">Cancel</button>
         <button type="button" class="btn btn-primary" id="modal-confirm">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Server Info Modal -->
+  <div class="modal-overlay" id="server-info-modal">
+    <div class="modal" style="max-width: 600px;">
+      <h3>📡 Server Information</h3>
+      <p style="color: #999; margin-bottom: 20px;">Use these URLs to access the overlay and control panel from other devices</p>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- OBS Overlay URL -->
+        <div>
+          <label style="display: block; margin-bottom: 8px; color: #3B82F6; font-weight: 600;">OBS Overlay URL</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="modal-obs-url" readonly style="flex: 1; background: #0D0D0D; cursor: text; font-family: 'Courier New', monospace; font-size: 12px; padding: 10px;">
+            <button type="button" class="btn btn-secondary" id="modal-copy-obs-btn">Copy</button>
+          </div>
+          <small style="display: block; margin-top: 6px; color: #666;">Add this as a Browser Source in OBS (1920x1080)</small>
+        </div>
+
+        <!-- Remote Control URL -->
+        <div>
+          <label style="display: block; margin-bottom: 8px; color: #10B981; font-weight: 600;">Remote Control URL</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="modal-remote-url" readonly style="flex: 1; background: #0D0D0D; cursor: text; font-family: 'Courier New', monospace; font-size: 12px; padding: 10px;">
+            <button type="button" class="btn btn-secondary" id="modal-copy-remote-btn">Copy</button>
+          </div>
+          <small style="display: block; margin-top: 6px; color: #666;">Open this from your phone/tablet on the same network</small>
+        </div>
+
+        <!-- Server Details -->
+        <div style="background: #0D0D0D; padding: 12px; border-radius: 6px; border: 1px solid #2A2A2A; margin-top: 8px;">
+          <div style="display: grid; grid-template-columns: 120px 1fr; gap: 8px; font-size: 13px;">
+            <span style="color: #666;">Local IP:</span>
+            <span style="color: #FFF; font-family: 'Courier New', monospace;" id="modal-local-ip">Loading...</span>
+            <span style="color: #666;">Port:</span>
+            <span style="color: #FFF; font-family: 'Courier New', monospace;" id="modal-port">Loading...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button type="button" class="btn btn-primary" id="server-info-close">Close</button>
       </div>
     </div>
   </div>

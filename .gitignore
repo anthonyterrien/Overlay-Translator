@@ -34,6 +34,9 @@ desktop.ini
 .env.local
 .env.*.local
 
+# User configuration (contains personal settings)
+config.json
+
 # Temporary files
 *.tmp
 *.temp

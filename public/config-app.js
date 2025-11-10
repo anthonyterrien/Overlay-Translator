@@ -60,60 +60,30 @@ const previewScaleInput = document.getElementById('previewScale');
 const previewScaleValue = document.getElementById('previewScale-value');
 const resetBtn = document.getElementById('reset-btn');
 
-// Server info modal elements
-const serverInfoBtn = document.getElementById('server-info-btn');
-const serverInfoModal = document.getElementById('server-info-modal');
-const serverInfoClose = document.getElementById('server-info-close');
-const modalObsUrl = document.getElementById('modal-obs-url');
-const modalRemoteUrl = document.getElementById('modal-remote-url');
-const modalLocalIp = document.getElementById('modal-local-ip');
-const modalPort = document.getElementById('modal-port');
-const modalCopyObsBtn = document.getElementById('modal-copy-obs-btn');
-const modalCopyRemoteBtn = document.getElementById('modal-copy-remote-btn');
-
 // WebSocket connection
 let ws = null;
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', async () => {
   await loadConfig();
-  await loadServerInfo();
   setupEventListeners();
   connectWebSocket();
 });
 
-// Load configuration from Electron
+// Load configuration from server (HTTP API)
 async function loadConfig() {
   try {
-    const config = await window.api.getConfig();
+    const response = await fetch('/api/config');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const config = await response.json();
     currentConfig = config;
     updateFormFields(config);
     updatePreview();
   } catch (err) {
     console.error('Error loading config:', err);
     showStatus('Error loading configuration', 'error');
-  }
-}
-
-// Load server info (IP and URLs)
-async function loadServerInfo() {
-  try {
-    const response = await fetch('http://localhost:3000/api/server-info');
-    const data = await response.json();
-
-    // Update modal fields
-    modalObsUrl.value = data.urls.live;
-    modalRemoteUrl.value = data.urls.config;
-    modalLocalIp.textContent = data.localIP;
-    modalPort.textContent = data.port;
-
-    console.log('Server info loaded:', data);
-  } catch (err) {
-    console.error('Error loading server info:', err);
-    modalObsUrl.value = 'http://localhost:3000/live (loading...)';
-    modalRemoteUrl.value = 'http://localhost:3000/config (loading...)';
-    modalLocalIp.textContent = 'Error loading';
-    modalPort.textContent = 'Error loading';
   }
 }
 
@@ -271,13 +241,6 @@ function setupEventListeners() {
     }
   });
 
-  // Listen for config updates from other sources
-  window.api.onConfigUpdated((config) => {
-    currentConfig = config;
-    updateFormFields(config);
-    updatePreview();
-  });
-
   // Handle window resize for preview scaling
   window.addEventListener('resize', calculatePreviewScale);
 
@@ -295,43 +258,6 @@ function setupEventListeners() {
   // Whispering Tiger control event listeners
   currentLanguageSelect.addEventListener('change', (e) => {
     sendWhisperingSetting('current_language', e.target.value);
-  });
-
-  // Server info modal
-  serverInfoBtn.addEventListener('click', () => {
-    serverInfoModal.classList.add('show');
-    // Update modal with latest server info
-    loadServerInfo();
-  });
-
-  serverInfoClose.addEventListener('click', () => {
-    serverInfoModal.classList.remove('show');
-  });
-
-  // Click outside server info modal to close
-  serverInfoModal.addEventListener('click', (e) => {
-    if (e.target === serverInfoModal) {
-      serverInfoModal.classList.remove('show');
-    }
-  });
-
-  // Copy from modal
-  modalCopyObsBtn.addEventListener('click', () => {
-    copyToClipboard(modalObsUrl.value, 'OBS URL copied to clipboard!');
-  });
-
-  modalCopyRemoteBtn.addEventListener('click', () => {
-    copyToClipboard(modalRemoteUrl.value, 'Remote URL copied to clipboard!');
-  });
-}
-
-// Copy text to clipboard
-function copyToClipboard(text, successMessage) {
-  navigator.clipboard.writeText(text).then(() => {
-    showStatus(successMessage || 'Copied to clipboard!', 'success');
-  }).catch(err => {
-    console.error('Failed to copy:', err);
-    showStatus('Failed to copy to clipboard', 'error');
   });
 }
 
@@ -390,12 +316,24 @@ function getConfigFromForm() {
   };
 }
 
-// Save configuration
+// Save configuration (HTTP API)
 async function saveConfig() {
   const config = getConfigFromForm();
 
   try {
-    const result = await window.api.saveConfig(config);
+    const response = await fetch('/api/config', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(config)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
     if (result.success) {
       currentConfig = result.config;
       showStatus('Configuration saved successfully!', 'success');
@@ -408,7 +346,7 @@ async function saveConfig() {
   }
 }
 
-// Reset configuration to default
+// Reset configuration to default (HTTP API)
 async function resetConfig() {
   const defaultConfig = {
     color: '#FFFFFF',
@@ -424,7 +362,19 @@ async function resetConfig() {
   };
 
   try {
-    const result = await window.api.saveConfig(defaultConfig);
+    const response = await fetch('/api/config', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(defaultConfig)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
     if (result.success) {
       currentConfig = result.config;
       updateFormFields(currentConfig);
@@ -453,7 +403,14 @@ function showStatus(message, type) {
 // Connect to WebSocket for live preview
 function connectWebSocket() {
   try {
-    ws = new WebSocket('ws://localhost:3000');
+    // Get WebSocket URL based on current location (works for both localhost and remote)
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsHost = window.location.hostname;
+    const wsPort = window.location.port || '3000';
+    const wsUrl = `${wsProtocol}//${wsHost}:${wsPort}`;
+
+    console.log('Connecting to WebSocket:', wsUrl);
+    ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       console.log('Connected to WebSocket');

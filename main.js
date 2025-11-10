@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const path = require('path');
 const { fork } = require('child_process');
 const fs = require('fs');
@@ -11,15 +11,7 @@ const CONFIG_FILE = path.join(__dirname, 'config.json');
 
 // Load configuration
 function loadConfig() {
-  try {
-    if (fs.existsSync(CONFIG_FILE)) {
-      const data = fs.readFileSync(CONFIG_FILE, 'utf8');
-      return JSON.parse(data);
-    }
-  } catch (err) {
-    console.error('Error loading config:', err);
-  }
-  return {
+  const defaultConfig = {
     color: '#FFFFFF',
     fontSize: '24px',
     fontFamily: 'Arial, sans-serif',
@@ -33,6 +25,32 @@ function loadConfig() {
     marginRight: '0px',
     maxLines: 5
   };
+
+  try {
+    if (fs.existsSync(CONFIG_FILE)) {
+      const stats = fs.statSync(CONFIG_FILE);
+
+      // Limit config file size to 100KB to prevent memory issues
+      if (stats.size > 102400) {
+        console.error('Config file too large (>100KB), using default config');
+        return defaultConfig;
+      }
+
+      const data = fs.readFileSync(CONFIG_FILE, 'utf8');
+      const config = JSON.parse(data);
+
+      // Validate loaded config
+      if (typeof config !== 'object' || config === null) {
+        console.error('Invalid config file format, using default config');
+        return defaultConfig;
+      }
+
+      return config;
+    }
+  } catch (err) {
+    console.error('Error loading config:', err);
+  }
+  return defaultConfig;
 }
 
 // Save configuration
@@ -55,8 +73,15 @@ function createMainWindow() {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    title: 'Overlay Translator - Configuration'
+    title: 'Overlay Translator - Configuration',
+    autoHideMenuBar: true, // Hide menu bar (press Alt to show temporarily)
+    backgroundColor: '#0D0D0D', // Modern dark background
+    frame: true, // Keep native window frame
+    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default' // Modern style on macOS
   });
+
+  // Remove application menu completely
+  Menu.setApplicationMenu(null);
 
   mainWindow.loadFile(path.join(__dirname, 'src/renderer/index.html'));
 

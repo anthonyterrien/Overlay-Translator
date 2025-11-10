@@ -98,19 +98,21 @@
 
   <script>
     const container = document.getElementById('overlay-container');
+
+    // Fixed max lines for translations (not configurable)
+    const MAX_TRANSLATION_LINES = 1;
+
     let config = {
       color: '#FFFFFF',
       fontSize: '24px',
       fontFamily: 'Arial, sans-serif',
       textAlign: 'center',
-      scrollEnabled: false,
       backgroundColor: 'transparent',
       backgroundOpacity: 100,
       padding: '10px',
       paddingHorizontal: '0px',
       marginLeft: '0px',
-      marginRight: '0px',
-      maxLines: 5
+      marginRight: '0px'
     };
 
     const translations = [];
@@ -152,8 +154,8 @@
 
       translations.push(text);
 
-      // Keep only the last N lines
-      if (translations.length > config.maxLines) {
+      // Keep only the last MAX_TRANSLATION_LINES
+      if (translations.length > MAX_TRANSLATION_LINES) {
         translations.shift();
       }
 
@@ -170,15 +172,6 @@
         applyStyle(line);
         container.appendChild(line);
       });
-
-      // Apply scrollable class if enabled
-      if (config.scrollEnabled) {
-        container.classList.add('scrollable');
-        // Auto-scroll to bottom
-        container.scrollTop = container.scrollHeight;
-      } else {
-        container.classList.remove('scrollable');
-      }
     }
 
     function applyStyle(element) {

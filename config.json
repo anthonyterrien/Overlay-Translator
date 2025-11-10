@@ -1,14 +1,12 @@
 {
-  "color": "#b3b3b3",
+  "color": "#c4c4c4",
   "fontSize": "35px",
   "fontFamily": "'Trebuchet MS', sans-serif",
   "textAlign": "center",
-  "scrollEnabled": false,
-  "backgroundColor": "#383838",
-  "backgroundOpacity": 20,
-  "padding": "23px",
-  "paddingHorizontal": "120px",
+  "backgroundColor": "#ee2b2b",
+  "backgroundOpacity": 30,
+  "padding": "10px",
+  "paddingHorizontal": "50px",
   "marginLeft": "0px",
-  "marginRight": "0px",
-  "maxLines": 1
+  "marginRight": "0px"
 }
